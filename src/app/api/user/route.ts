@@ -37,9 +37,15 @@ export async function POST(req: Request) {
     const newUser = await db.user.create({
       data: { email, username, password: hashedPassword },
     });
+    const { password: pswd, ...user } = newUser;
     return NextResponse.json(
-      { user: newUser, message: "User created successfully" },
+      { user, message: "User created successfully" },
       { status: 201 }
     );
-  } catch (error) {}
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
+  }
 }
