@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import GoogleSignInButton from "../GoogleSignInButton";
+import { useRouter } from "next/navigation";
 
 const FormSchema = z
   .object({
@@ -34,11 +35,8 @@ const FormSchema = z
     message: "Password does not match",
   });
 
-const onSubmit = (values: z.infer<typeof FormSchema>) => {
-  console.log(values);
-};
-
 function SignUpForm() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -48,6 +46,35 @@ function SignUpForm() {
       confirmPassword: "",
     },
   });
+
+  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
+    console.log("onSubmit");
+    // console.log(
+    //   JSON.stringify({
+    //     username: values.username,
+    //     email: values.email,
+    //     password: values.password,
+    //   })
+    // );
+    const response = await fetch("/api/user", {
+      method: "POST",
+      headers: {
+        // "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: values.username,
+        email: values.email,
+        password: values.password,
+      }),
+    });
+
+    if (response.ok) {
+      router.push("/sign-in");
+    } else {
+      console.error("Sign up failed");
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">

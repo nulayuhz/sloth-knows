@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { signIn } from "next-auth/react";
 
 // import { toast } from "@/components/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import GoogleSignInButton from "../GoogleSignInButton";
+import { useRouter } from "next/navigation";
 
 const FormSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -27,11 +29,8 @@ const FormSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-const onSubmit = (values: z.infer<typeof FormSchema>) => {
-  console.log(values);
-};
-
 function SignInForm() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -39,6 +38,23 @@ function SignInForm() {
       password: "",
     },
   });
+
+  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
+    console.log(values);
+    const signInData = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    });
+    console.log(signInData);
+    if (signInData?.error) {
+      console.log(signInData.error);
+    } else {
+      router.replace("/admin");
+      router.refresh();
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
