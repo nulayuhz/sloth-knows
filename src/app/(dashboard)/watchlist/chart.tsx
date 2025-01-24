@@ -30,7 +30,6 @@ export default function Chart() {
     };
 
     getCharts();
-    console.log("CHART!!!!");
   }, []);
 
   useEffect(() => {

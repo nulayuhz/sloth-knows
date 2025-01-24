@@ -6,11 +6,17 @@ export async function POST(req: Request) {
     if (!screenerApi) {
       throw new Error("please add env variable FINWIZ_STOCK_CHART_API_URL");
     }
+    const body = await req.json();
+    const { offset } = body;
+
     const response = await fetch(screenerApi, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        offset,
+      }),
     });
 
     if (response.ok) {
