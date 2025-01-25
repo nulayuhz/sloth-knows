@@ -21,3 +21,25 @@ model User {
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
 }
+
+model Screener {
+  id Int @id @default(autoincrement())
+  stocks ScreenerStock[]
+  createdAt DateTime @default(now())
+}
+
+model ScreenerStock {
+  id Int @id @default(autoincrement())
+  screener Screener @relation(fields: [screenerId], references: [id])
+  screenerId Int
+  screenerStockId String
+  name String
+  description String
+  close Float
+  volume BigInt
+  market_cap_basic Float
+  sector String
+  createdAt DateTime @default(now())
+  isProcessed Boolean @default(false)
+  potential Int @default(1)
+}

@@ -57,25 +57,19 @@ const Screener: FunctionComponent<ScreenerProps> = () => {
       <TableBody>
         {stocks?.map((stock, stockIndex: number) => {
           return (
-            <>
-              <TableRow key={stock.d[0]}>
-                <TableCell className="font-medium" key="count">
-                  {stockIndex + 1}
-                </TableCell>
-                <TableCell className="font-medium" key="name">
-                  {stock.d[0]} {stock.d[1]}
-                </TableCell>
-                {stock.d.map((col, index: number) => {
-                  return (
-                    index > 1 && (
-                      <TableCell key={index + "col"}>
-                        {stock.d[index]}
-                      </TableCell>
-                    )
-                  );
-                })}
-              </TableRow>
-            </>
+            <TableRow key={stockIndex}>
+              <TableCell className="font-medium">{stockIndex + 1}</TableCell>
+              <TableCell className="font-medium">
+                {stock.d[0]} {stock.d[1]}
+              </TableCell>
+              {stock.d.map((col, index: number) => {
+                return (
+                  index > 1 && (
+                    <TableCell key={index}>{stock.d[index]}</TableCell>
+                  )
+                );
+              })}
+            </TableRow>
           );
         })}
       </TableBody>

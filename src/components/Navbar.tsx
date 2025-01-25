@@ -9,7 +9,7 @@ interface NavbarProps {}
 
 const Navbar: FunctionComponent<NavbarProps> = async () => {
   const session = await getServerSession(authOptions);
-  console.log("navbar", session?.user);
+  // console.log("navbar", session?.user);
   return (
     <div className="bg-stone-300 py-2 border-b border-s-stone-600 text-stone-800 fixed w-full">
       <div className="flex items-center justify-between">
