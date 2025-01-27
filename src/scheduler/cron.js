@@ -1,4 +1,41 @@
 import cron from "node-cron";
+import { Queue, Worker } from "bullmq";
+
+// Create a new connection in every instance
+export const analyzeQueue = new Queue("analyzeQueue", {
+  connection: {
+    host: process.env.REDIS_URL,
+    port: 6379,
+  },
+});
+
+export const sleep = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms || 0));
+};
+
+const analyzeWorker = new Worker(
+  "analyzeQueue",
+  async (job) => {
+    console.log(job.data);
+  },
+  {
+    connection: {
+      host: process.env.REDIS_URL,
+      port: 6379,
+    },
+    limiter: {
+      max: 1,
+    },
+  }
+);
+
+analyzeWorker.on("completed", (job) => {
+  console.log(`${job.id} has completed!`);
+});
+
+analyzeWorker.on("failed", (job, err) => {
+  console.log(`${job.id} has failed with ${err.message}`);
+});
 
 const getScreenerStocks = async () => {
   const response = await fetch("http://localhost:3000/api/screener", {
@@ -21,15 +58,29 @@ const getScreenerStocks = async () => {
 // day of month 	1-31
 // month 	1-12 (or names)
 // day of week 	0-7 (or names, 0 or 7 are sunday)
-// 30 16 * * 1-5
+// 4:30PM Mon-Fri: 30 16 * * 1-5
 
 const task = cron.schedule("30 16 * * 1-5", async () => {
   console.log("running at 4:30PM Mon-Fri");
-  const stocks = await getScreenerStocks();
-  console.log(stocks);
-  // call screener api
   // store in db: ticker, date, screenId = ticker+date,
-  // push result into bullmq
+  const stocks = await getScreenerStocks();
+  // console.log(stocks);
+
+  let i = 0;
+  while (i < stocks.totalCount) {
+    await analyzeQueue.add(
+      "analyzeChart",
+      stocks.data[i],
+      { removeOnComplete: true }
+      // { delay: 2000 }
+    );
+    await sleep(6 * 1000 * 3); // throttle job to process to one every 3min
+    i += 1;
+  }
 });
 
 task.start();
+
+// clean up
+// await analyzeQueue.obliterate();
+// console.log("drained all");

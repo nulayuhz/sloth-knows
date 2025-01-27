@@ -26,6 +26,10 @@ npm install
 
 ```
 
+### Install redis
+
+https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/
+
 First, run the development server:
 
 ```bash

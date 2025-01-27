@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
+import { sleep } from "@/lib/utils";
 
 const screenerApi = process.env.FINWIZ_STOCK_SCREENER_API_URL;
-
-const sleep = (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms || 0));
-};
 
 const getAllScreenerStocks = async () => {
   if (!screenerApi) {
@@ -32,7 +29,7 @@ const getAllScreenerStocks = async () => {
       totalCount = count;
       allData.push(...data);
     }
-    sleep(1000);
+    await sleep(1000);
     offset += 1;
   }
   return { data: allData, totalCount };
