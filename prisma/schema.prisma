@@ -18,14 +18,14 @@ model User {
   email String @unique
   username String @unique
   password String
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
   updateAt DateTime @updatedAt
 }
 
 model Screener {
   id Int @id @default(autoincrement())
   stocks ScreenerStock[]
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
 }
 
 model ScreenerStock {
@@ -36,10 +36,20 @@ model ScreenerStock {
   name String
   description String
   close Float
-  volume BigInt
-  market_cap_basic Float
+  volume String
+  market_cap_basic String
   sector String
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
   isProcessed Boolean @default(false)
   potential Int @default(1)
+  stockAnalysis StockAnalysis?
+}
+
+model StockAnalysis {
+  id Int @id @default(autoincrement())
+  name String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  screenerStock ScreenerStock @relation(fields: [screenerStockId], references: [id])
+  screenerStockId Int @unique
+  content String
 }

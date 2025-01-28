@@ -25,11 +25,8 @@ export async function PUT(
       },
       data: body,
     });
-    const updateUserWithBigInt = JSON.stringify(updateUser, (_, v) =>
-      typeof v === "bigint" ? v.toString() : v
-    );
 
-    return NextResponse.json(updateUserWithBigInt, { status: 201 });
+    return NextResponse.json(updateUser, { status: 201 });
   } catch (error) {
     console.log(error);
     return NextResponse.json({ error }, { status: 500 });

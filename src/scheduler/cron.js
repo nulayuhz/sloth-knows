@@ -47,11 +47,56 @@ const analyzeStock = async (charts) => {
   return data;
 };
 
+const markStockAsProcessed = async (id) => {
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/screener-stock/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          isProcessed: true,
+        }),
+      }
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const createAnalysis = async (stockId, ticker, analysis) => {
+  // console.log(stockId, ticker, analysis);
+  const { data } = analysis;
+  const { message } = data;
+  const { content } = message;
+  // console.log(content);
+  const response = await fetch(
+    `http://localhost:3000/api/stock-analysis/create`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        screenerStockId: stockId,
+        name: ticker,
+        content: content,
+      }),
+    }
+  );
+  return await response.json();
+};
+
 const analyzeWorker = new Worker(
   "analyzeQueue",
   async (job) => {
-    console.log(job.data);
-    const data = JSON.parse(job.data);
+    console.log("worker....", job.data);
+    const { data } = job;
+    // const data = JSON.parse(job.data);
     console.log(data.id, data.name);
     const ticker = data.name;
 
@@ -61,7 +106,11 @@ const analyzeWorker = new Worker(
 
     console.log("analyzing", ticker);
     const analysis = await analyzeStock(charts.data);
-    console.log(analysis);
+    // console.log(analysis);
+
+    console.log("storing analysis", data.name);
+    const updatedAnalysis = await createAnalysis(data.id, data.name, analysis);
+    console.log(updatedAnalysis);
   },
   {
     connection: {
@@ -74,8 +123,12 @@ const analyzeWorker = new Worker(
   }
 );
 
-analyzeWorker.on("completed", (job) => {
+analyzeWorker.on("completed", async (job) => {
   console.log(`${job.id} has completed!`);
+  const { data } = job;
+  console.log(data.id, data.name);
+  const updatedStock = await markStockAsProcessed(data.id);
+  console.log("marked as processed", data.name);
 });
 
 analyzeWorker.on("failed", (job, err) => {
@@ -120,7 +173,7 @@ const task = cron.schedule("* * * * 1-5", async () => {
       { removeOnComplete: true, removeOnFail: true }
       // { delay: 2000 }
     );
-    await sleep(10 * 1000); // throttle job to process to one every 3min
+    await sleep(10 * 1000 * 3); // throttle job to process to one every 3min
     i += 1;
   }
 });

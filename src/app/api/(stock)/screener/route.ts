@@ -58,6 +58,7 @@ export async function POST() {
     start.setHours(0, 0, 0);
     let end = new Date();
     end.setHours(23, 59, 59);
+    console.log(start, end);
     const existingScreener = await db.screener.findFirst({
       where: {
         AND: [{ createdAt: { gte: start } }, { createdAt: { lte: end } }],
@@ -67,16 +68,19 @@ export async function POST() {
       },
     });
 
-    const existingScreenerStocksWithBigInt = existingScreener?.stocks.map(
-      (stock) =>
-        JSON.stringify(stock, (_, v) =>
-          typeof v === "bigint" ? v.toString() : v
-        )
-    );
+    // const existingScreenerStocksWithBigInt = existingScreener?.stocks.map(
+    //   (stock) => {
+    //     // console.log(stock);
+    //     return JSON.stringify(stock, (_, v) =>
+    //       typeof v === "bigint" ? v.toString() : v
+    //     );
+    //   }
+    // );
     if (existingScreener) {
+      console.log("TEST........");
       return NextResponse.json(
         {
-          data: existingScreenerStocksWithBigInt,
+          data: existingScreener?.stocks,
           totalCount: existingScreener.stocks.length,
         },
         { status: 201 }

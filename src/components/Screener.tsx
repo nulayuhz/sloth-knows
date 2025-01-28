@@ -14,9 +14,20 @@ import {
 
 interface ScreenerProps {}
 interface Stock {
-  d: (string | number)[];
-  s: string;
+  id: number;
+  screenerId: number;
+  screenerStockId: string;
+  name: string;
+  description: string;
+  close: number;
+  volume: string;
+  market_cap_basic: string;
+  sector: string;
+  createdAt: string;
+  isProcessed: boolean;
+  potential: number;
 }
+
 const Screener: FunctionComponent<ScreenerProps> = () => {
   const [screenerData, setScreenerData] = useState<{
     data: Stock[];
@@ -30,11 +41,12 @@ const Screener: FunctionComponent<ScreenerProps> = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          offset: 1,
-        }),
+        // body: JSON.stringify({
+        //   offset: 1,
+        // }),
       });
       const data = await response.json();
+      console.log(data);
       setScreenerData(data);
     };
 
@@ -47,11 +59,13 @@ const Screener: FunctionComponent<ScreenerProps> = () => {
       <TableHeader>
         <TableRow>
           <TableHead className="w-[100px]">#</TableHead>
-          <TableHead className="w-[500px]">Company</TableHead>
-          <TableHead>Price</TableHead>
-          <TableHead>Volume</TableHead>
-          <TableHead>Market Cap</TableHead>
+          <TableHead className="w-[100px]">Company</TableHead>
+          <TableHead className="text-right">Price</TableHead>
+          <TableHead className="text-right">Volume</TableHead>
+          <TableHead className="text-right">Market Cap</TableHead>
           <TableHead className="">Sector</TableHead>
+          <TableHead className="">Processed</TableHead>
+          <TableHead className="">Potential</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -59,16 +73,21 @@ const Screener: FunctionComponent<ScreenerProps> = () => {
           return (
             <TableRow key={stockIndex}>
               <TableCell className="font-medium">{stockIndex + 1}</TableCell>
-              <TableCell className="font-medium">
-                {stock.d[0]} {stock.d[1]}
+              <TableCell className="font-medium">{stock.name}</TableCell>
+              <TableCell className="font-medium text-right w-[200px]">
+                {stock.close}
               </TableCell>
-              {stock.d.map((col, index: number) => {
-                return (
-                  index > 1 && (
-                    <TableCell key={index}>{stock.d[index]}</TableCell>
-                  )
-                );
-              })}
+              <TableCell className="font-medium text-right w-[200px]">
+                {stock.volume}
+              </TableCell>
+              <TableCell className="font-medium text-right w-[200px]">
+                {stock.market_cap_basic}
+              </TableCell>
+              <TableCell className="font-medium">{stock.sector}</TableCell>
+              <TableCell className="font-medium">
+                {stock.isProcessed ? "yes" : "no"}
+              </TableCell>
+              <TableCell className="font-medium">{stock.potential}</TableCell>
             </TableRow>
           );
         })}
