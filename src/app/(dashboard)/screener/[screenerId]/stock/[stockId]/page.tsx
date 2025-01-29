@@ -30,13 +30,11 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        {/* <p>Select a Stock {params.stockId}</p> */}
-        <h1>{stockAnalysis?.name}</h1>
-        {tickers.length > 0 && <Chart tickers={tickers}></Chart>}
-        <p className="whitespace-pre-wrap">{stockAnalysis?.content}</p>
-      </main>
+    <div className="w-full">
+      {/* <p>Select a Stock {params.stockId}</p> */}
+      <h1>{stockAnalysis?.name}</h1>
+      {tickers.length > 0 && <Chart tickers={tickers}></Chart>}
+      <p className="whitespace-pre-wrap">{stockAnalysis?.content}</p>
     </div>
   );
 }

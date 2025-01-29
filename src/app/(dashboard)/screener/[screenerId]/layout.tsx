@@ -47,14 +47,20 @@ export default function Layout({
     console.log(stock);
     router.push(`/screener/${stock.screenerId}/stock/${stock.id}`);
   };
-
+  // grid-rows-[1fr_1px_auto_1px_auto]
   return (
-    <div className="flex p-8 pb-20 sm:pt-20 font-[family-name:var(--font-geist-sans)]">
-      <aside className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <p>Screener ID Uptrend Stocks Discovery {new Date().toDateString()}</p>
-        <Screener stocks={stocks} handleRowClick={handleRowClick} />
+    <div className="grid min-h-dvh grid-cols-[900px_1fr] gap-10 mt-20 pt-26.25">
+      <aside className="relative col-start-1 row-span-full row-start-1">
+        <div className="inset-0 absolute">
+          <div className="sticky top-14.25 bottom-0 left-0 h-full max-h-[calc(100dvh-(var(--spacing)*14.25))] w-2xs overflow-y-auto p-6">
+            <p>
+              Screener ID Uptrend Stocks Discovery {new Date().toDateString()}
+            </p>
+            <Screener stocks={stocks} handleRowClick={handleRowClick} />
+          </div>
+        </div>
       </aside>
-      {children}
+      <main className="relative grid grid-cols-subgrid">{children}</main>
     </div>
   );
 }

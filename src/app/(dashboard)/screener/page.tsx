@@ -25,7 +25,7 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-8 mt-20 ml-10 mr-10 row-start-2 items-center sm:items-start">
+    <div className="mt-20 ml-20 items-center sm:items-start">
       {/* <p>Uptrend Stocks Discovery {new Date().toDateString()}</p>
       <Screener /> */}
       {/* <Screener stocks={stocks} /> */}

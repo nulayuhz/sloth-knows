@@ -27,10 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} flex flex-col antialiased bg-stone-300 text-stone-800`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-stone-300 text-stone-800`}
       >
         <Navbar></Navbar>
-        <main className="">{children}</main>
+        <main className="grid min-h-dvh grid-cols-1 grid-rows-[1fr_1px_auto_1px_auto] pt-26.25">
+          {children}
+        </main>
         <Toaster />
       </body>
     </html>
