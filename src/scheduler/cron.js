@@ -1,6 +1,12 @@
 import cron from "node-cron";
 import { Queue, Worker } from "bullmq";
-
+import {
+  getStockCharts,
+  analyzeStock,
+  createAnalysis,
+  markStockAsProcessed,
+  getScreenerStocks,
+} from "./helpers.js";
 // remember to turn on redis first
 // on Windows, open PowerShell
 // run wsl
@@ -16,79 +22,6 @@ export const analyzeQueue = new Queue("analyzeQueue", {
 
 export const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms || 0));
-};
-
-const getStockCharts = async (tickers) => {
-  const response = await fetch("http://localhost:3000/api/chart", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      tickers: [tickers],
-      urlOnly: true,
-    }),
-  });
-  const data = await response.json();
-  return data;
-};
-
-const analyzeStock = async (charts) => {
-  const response = await fetch("http://localhost:3000/api/analysis", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      urls: charts,
-    }),
-  });
-  const data = await response.json();
-  return data;
-};
-
-const markStockAsProcessed = async (id) => {
-  try {
-    const response = await fetch(
-      `http://localhost:3000/api/screener-stock/${id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          isProcessed: true,
-        }),
-      }
-    );
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const createAnalysis = async (stockId, ticker, analysis) => {
-  // console.log(stockId, ticker, analysis);
-  const { data } = analysis;
-  const { message } = data;
-  const { content } = message;
-  // console.log(content);
-  const response = await fetch(
-    `http://localhost:3000/api/stock-analysis/create`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        screenerStockId: stockId,
-        name: ticker,
-        content: content,
-      }),
-    }
-  );
-  return await response.json();
 };
 
 const analyzeWorker = new Worker(
@@ -135,20 +68,6 @@ analyzeWorker.on("failed", (job, err) => {
   console.log(`${job.id} has failed with ${err.message}`);
 });
 
-const getScreenerStocks = async () => {
-  const response = await fetch("http://localhost:3000/api/screener", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      offset: 1,
-    }),
-  });
-  const data = await response.json();
-  return data;
-};
-
 // node-cron DOC: https://github.com/node-cron/node-cron
 // second 	0-59 (optional)
 // minute 	0-59
@@ -158,11 +77,10 @@ const getScreenerStocks = async () => {
 // day of week 	0-7 (or names, 0 or 7 are sunday)
 // 4:30PM Mon-Fri: 30 16 * * 1-5
 
-const task = cron.schedule("* * * * 1-5", async () => {
+const task = cron.schedule("06 11 * * 1-5", async () => {
   console.log("running at 4:30PM Mon-Fri");
   // store in db: ticker, date, screenId = ticker+date,
   const stocks = await getScreenerStocks();
-  // console.log(stocks);
 
   let i = 0;
   while (i < stocks.totalCount) {
@@ -170,15 +88,26 @@ const task = cron.schedule("* * * * 1-5", async () => {
     await analyzeQueue.add(
       "analyzeChart",
       stocks.data[i],
-      { removeOnComplete: true, removeOnFail: true }
+      { removeOnComplete: true }
       // { delay: 2000 }
     );
-    await sleep(10 * 1000 * 3); // throttle job to process to one every 3min
+    await sleep(60 * 1000 * 3); // throttle job to process to one every 3min
     i += 1;
   }
 });
 
 task.start();
+
+// test
+// const task = cron.schedule("* * * * 1-5", async () => {
+//   console.log("running test");
+//   // store in db: ticker, date, screenId = ticker+date,
+//   const stocks = await getScreenerStocks();
+
+//   console.log(stocks.data[0]);
+// });
+
+// task.start();
 
 // clean up
 // await analyzeQueue.obliterate();

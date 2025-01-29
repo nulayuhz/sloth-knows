@@ -1,6 +1,6 @@
 "use client";
 
-// import Link from "next/link";
+import Link from "next/link";
 import { FunctionComponent, useEffect, useState } from "react";
 import {
   Table,
@@ -12,7 +12,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface ScreenerProps {}
+interface ScreenerProps {
+  stocks: Stock[];
+  handleRowClick: (stock: Stock) => void;
+}
 interface Stock {
   id: number;
   screenerId: number;
@@ -28,31 +31,10 @@ interface Stock {
   potential: number;
 }
 
-const Screener: FunctionComponent<ScreenerProps> = () => {
-  const [screenerData, setScreenerData] = useState<{
-    data: Stock[];
-    totalCount: number;
-  }>();
-  const { data: stocks } = screenerData || {};
-  useEffect(() => {
-    const presetScreenStocks = async () => {
-      const response = await fetch("/api/screener", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // body: JSON.stringify({
-        //   offset: 1,
-        // }),
-      });
-      const data = await response.json();
-      console.log(data);
-      setScreenerData(data);
-    };
-
-    presetScreenStocks();
-  }, []);
-
+const Screener: FunctionComponent<ScreenerProps> = ({
+  stocks,
+  handleRowClick,
+}) => {
   return (
     <Table>
       <TableCaption>Screener</TableCaption>
@@ -71,7 +53,7 @@ const Screener: FunctionComponent<ScreenerProps> = () => {
       <TableBody>
         {stocks?.map((stock, stockIndex: number) => {
           return (
-            <TableRow key={stockIndex}>
+            <TableRow key={stockIndex} onClick={() => handleRowClick(stock)}>
               <TableCell className="font-medium">{stockIndex + 1}</TableCell>
               <TableCell className="font-medium">{stock.name}</TableCell>
               <TableCell className="font-medium text-right w-[200px]">

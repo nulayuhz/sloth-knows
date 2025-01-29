@@ -52,6 +52,20 @@ const getScreenerStocksByOffset = async (offset: number) => {
   return response;
 };
 
+// get the most recent screener
+export async function GET() {
+  const response = await db.screener.findMany({
+    orderBy: {
+      id: "desc",
+    },
+    take: 1,
+    include: {
+      stocks: true,
+    },
+  });
+  return NextResponse.json(response, { status: 200 });
+}
+
 export async function POST() {
   try {
     let start = new Date();
@@ -77,7 +91,7 @@ export async function POST() {
     //   }
     // );
     if (existingScreener) {
-      console.log("TEST........");
+      console.log("existing screener........");
       return NextResponse.json(
         {
           data: existingScreener?.stocks,
@@ -90,7 +104,7 @@ export async function POST() {
 
       let allScreenedStocks = await getAllScreenerStocks();
       const newScreener = await db.screener.create({});
-
+      console.log(allScreenedStocks);
       try {
         await db.screenerStock.createMany({
           data: allScreenedStocks.data.map((stock: any) => {
@@ -98,8 +112,8 @@ export async function POST() {
               name: stock.d[0],
               description: stock.d[1],
               close: stock.d[2],
-              volume: stock.d[3],
-              market_cap_basic: stock.d[4],
+              volume: stock.d[3].toString(),
+              market_cap_basic: stock.d[4].toString(),
               sector: stock.d[5],
               screenerId: newScreener.id,
               screenerStockId: uuidv4(),
