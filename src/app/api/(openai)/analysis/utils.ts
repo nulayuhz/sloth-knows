@@ -5,10 +5,19 @@ import {
 } from "openai/resources/index.mjs";
 const openai = new OpenAI();
 
-const questions = `given the orange line for SMA 20, beige line for SMA 50, pink line for SMA 200, and other indicator lines; 1. what graph pattern and trend does the chart show? 2. tell me what are the resistance levels and support levels 3. predict the price action movement for the next month, 4. what is a good entry price if I were to look for short to medium term gain?`;
+// const questions = `given the orange line for SMA 20, beige line for SMA 50, pink line for SMA 200, and other trend lines; 1. what graph pattern and trend does the chart show? 2. tell me what are the resistance levels and support levels 3. predict the price action movement for the next month, 4. what is a good entry price if I were to look for short to medium term gain?`;
+const questions = `given the orange line for SMA 20, beige line for SMA 50, pink line for SMA 200, and other trend lines, can you identify the trend and predict short to medium term price action movement`;
+const failToInterpretWords = [
+  "unable to analyze",
+  "unable to view",
+  "unable to interpret",
+  "can't analyze",
+  "can't view",
+  "can't interpret",
+];
 
-export const analyzeImage = async (url: string) => {
-  const response = await openai.chat.completions.create({
+const askChat = async (url: string) => {
+  return await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       {
@@ -25,7 +34,19 @@ export const analyzeImage = async (url: string) => {
       },
     ],
   });
+};
 
+export const analyzeImage = async (url: string) => {
+  let response = await askChat(url);
+  let answer = response.choices[0]?.message?.content;
+  let failToAnalyze = failToInterpretWords.some((word) =>
+    answer?.includes(word)
+  );
+  if (failToAnalyze) {
+    // retry once
+    console.log("AI somehow couldn' analyze the image, retry one more time...");
+    response = await askChat(url);
+  }
   return response.choices[0];
 };
 

@@ -68,16 +68,7 @@ analyzeWorker.on("failed", (job, err) => {
   console.log(`${job.id} has failed with ${err.message}`);
 });
 
-// node-cron DOC: https://github.com/node-cron/node-cron
-// second 	0-59 (optional)
-// minute 	0-59
-// hour 	0-23
-// day of month 	1-31
-// month 	1-12 (or names)
-// day of week 	0-7 (or names, 0 or 7 are sunday)
-// 4:30PM Mon-Fri: 30 16 * * 1-5
-
-const task = cron.schedule("06 11 * * 1-5", async () => {
+const job = async () => {
   console.log("running at 4:30PM Mon-Fri");
   // store in db: ticker, date, screenId = ticker+date,
   const stocks = await getScreenerStocks();
@@ -94,9 +85,22 @@ const task = cron.schedule("06 11 * * 1-5", async () => {
     await sleep(60 * 1000 * 3); // throttle job to process to one every 3min
     i += 1;
   }
-});
+};
 
-task.start();
+// node-cron DOC: https://github.com/node-cron/node-cron
+// second 	0-59 (optional)
+// minute 	0-59
+// hour 	0-23
+// day of month 	1-31
+// month 	1-12 (or names)
+// day of week 	0-7 (or names, 0 or 7 are sunday)
+// 4:30PM Mon-Fri: 30 16 * * 1-5
+
+const task = cron.schedule("06 11 * * 1-5", job);
+// task.start();
+
+// run once
+job();
 
 // test
 // const task = cron.schedule("* * * * 1-5", async () => {
