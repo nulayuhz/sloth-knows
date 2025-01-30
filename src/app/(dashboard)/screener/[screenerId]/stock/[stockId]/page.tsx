@@ -21,7 +21,7 @@ export default function Page() {
         }),
       });
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       setStockAnalysis(data?.analysis);
       setTickers([data?.analysis?.name]);
     };
@@ -30,11 +30,11 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="w-full">
+    <div className="w-full p-10 mt-10 mx-auto grid max-w-2xl grid-cols-1 gap-10 xl:max-w-5xl xl:grid-cols-[minmax(0,1fr)_var(--container-2xs)]">
       {/* <p>Select a Stock {params.stockId}</p> */}
-      <h1>{stockAnalysis?.name}</h1>
+      {/* <h1>{stockAnalysis?.name}</h1> */}
       {tickers.length > 0 && <Chart tickers={tickers}></Chart>}
-      <p className="whitespace-pre-wrap">{stockAnalysis?.content}</p>
+      <p className="whitespace-pre-wrap mt-10">{stockAnalysis?.content}</p>
     </div>
   );
 }

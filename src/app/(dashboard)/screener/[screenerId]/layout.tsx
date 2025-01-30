@@ -25,7 +25,6 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  console.log("screener layout");
   const [stocks, setStocks] = useState([]);
   useEffect(() => {
     const presetScreenStocks = async () => {
@@ -36,7 +35,7 @@ export default function Layout({
         },
       });
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       setStocks(data?.[0].stocks);
     };
 
@@ -44,19 +43,18 @@ export default function Layout({
   }, []);
 
   const handleRowClick = (stock: Stock) => {
-    console.log(stock);
     router.push(`/screener/${stock.screenerId}/stock/${stock.id}`);
   };
   // grid-rows-[1fr_1px_auto_1px_auto]
   return (
-    <div className="grid min-h-dvh grid-cols-[900px_1fr] gap-10 mt-20 pt-26.25">
+    <div className="grid min-h-dvh grid-cols-[900px_1fr] grid-rows-[1fr_1px_auto_1px_auto] gap-10 pt-4">
       <aside className="relative col-start-1 row-span-full row-start-1">
         <div className="inset-0 absolute">
-          <div className="sticky top-14.25 bottom-0 left-0 h-full max-h-[calc(100dvh-(var(--spacing)*14.25))] w-2xs overflow-y-auto p-6">
-            <p>
-              Screener ID Uptrend Stocks Discovery {new Date().toDateString()}
-            </p>
-            <Screener stocks={stocks} handleRowClick={handleRowClick} />
+          <div className="sticky top-14 bottom-0 left-0 h-full max-h-[calc(100dvh-75px)] w-2xs overflow-y-auto p-6">
+            <div>
+              <p>Uptrend Stocks Discovery {new Date().toDateString()}</p>
+              <Screener stocks={stocks} handleRowClick={handleRowClick} />
+            </div>
           </div>
         </div>
       </aside>

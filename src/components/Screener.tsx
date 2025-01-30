@@ -37,11 +37,11 @@ const Screener: FunctionComponent<ScreenerProps> = ({
 }) => {
   return (
     <Table>
-      <TableCaption>Screener</TableCaption>
+      {/* <TableCaption>Screener</TableCaption> */}
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">#</TableHead>
-          <TableHead className="w-[100px]">Company</TableHead>
+          <TableHead className="w-[30px]">#</TableHead>
+          <TableHead className="w-[70px]">Company</TableHead>
           <TableHead className="text-right">Price</TableHead>
           <TableHead className="text-right">Volume</TableHead>
           <TableHead className="text-right">Market Cap</TableHead>
@@ -56,10 +56,10 @@ const Screener: FunctionComponent<ScreenerProps> = ({
             <TableRow key={stockIndex} onClick={() => handleRowClick(stock)}>
               <TableCell className="font-medium">{stockIndex + 1}</TableCell>
               <TableCell className="font-medium">{stock.name}</TableCell>
-              <TableCell className="font-medium text-right w-[200px]">
+              <TableCell className="font-medium text-right w-[70px]">
                 {stock.close}
               </TableCell>
-              <TableCell className="font-medium text-right w-[200px]">
+              <TableCell className="font-medium text-right w-[100px]">
                 {stock.volume}
               </TableCell>
               <TableCell className="font-medium text-right w-[200px]">

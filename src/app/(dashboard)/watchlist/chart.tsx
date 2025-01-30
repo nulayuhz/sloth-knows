@@ -45,7 +45,6 @@ export default function Chart() {
       });
       const res = await response.json();
       const { data } = res;
-      console.log(data);
       setAnalysis(data);
     };
 
