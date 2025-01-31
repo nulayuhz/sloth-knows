@@ -104,9 +104,10 @@ export async function POST() {
 
       let allScreenedStocks = await getAllScreenerStocks();
       const newScreener = await db.screener.create({});
-      console.log(allScreenedStocks);
+      // console.log(allScreenedStocks);
+      let createdScreenerStocks;
       try {
-        await db.screenerStock.createMany({
+        createdScreenerStocks = await db.screenerStock.createManyAndReturn({
           data: allScreenedStocks.data.map((stock: any) => {
             return {
               name: stock.d[0],
@@ -120,11 +121,17 @@ export async function POST() {
             };
           }),
         });
+        console.log(createdScreenerStocks);
+        return NextResponse.json(
+          {
+            data: createdScreenerStocks,
+            totalCount: allScreenedStocks.totalCount,
+          },
+          { status: 201 }
+        );
       } catch (error) {
         return NextResponse.json({ error }, { status: 500 });
       }
-
-      return NextResponse.json(allScreenedStocks, { status: 201 });
     }
   } catch (error) {
     console.log("Something went wrong...", error);

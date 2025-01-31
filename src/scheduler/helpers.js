@@ -77,9 +77,9 @@ export const getScreenerStocks = async () => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      offset: 1,
-    }),
+    // body: JSON.stringify({
+    //   offset: 1,
+    // }),
   });
   const data = await response.json();
   return data;

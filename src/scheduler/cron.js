@@ -72,17 +72,20 @@ const job = async () => {
   console.log("running at 4:30PM Mon-Fri");
   // store in db: ticker, date, screenId = ticker+date,
   const stocks = await getScreenerStocks();
-
+  console.log(stocks);
   let i = 0;
   while (i < stocks.totalCount) {
-    console.log("pushing to queue...", i);
-    await analyzeQueue.add(
-      "analyzeChart",
-      stocks.data[i],
-      { removeOnComplete: true }
-      // { delay: 2000 }
-    );
-    await sleep(60 * 1000 * 3); // throttle job to process to one every 3min
+    if (!stocks.data[i].isProcessed) {
+      console.log("pushing to queue...", i);
+      await analyzeQueue.add(
+        "analyzeChart",
+        stocks.data[i],
+        { removeOnComplete: true }
+        // { delay: 2000 }
+      );
+      await sleep(60 * 1000 * 3); // throttle job to process to one every 3min
+    }
+
     i += 1;
   }
 };
