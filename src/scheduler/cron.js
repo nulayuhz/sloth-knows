@@ -72,7 +72,7 @@ const job = async () => {
   console.log("running at 4:30PM Mon-Fri");
   // store in db: ticker, date, screenId = ticker+date,
   const stocks = await getScreenerStocks();
-  console.log(stocks);
+  // console.log(stocks);
   let i = 0;
   while (i < stocks.totalCount) {
     if (!stocks.data[i].isProcessed) {
@@ -83,7 +83,7 @@ const job = async () => {
         { removeOnComplete: true }
         // { delay: 2000 }
       );
-      await sleep(60 * 1000 * 3); // throttle job to process to one every 3min
+      await sleep(60 * 1000 * 1); // throttle job to process to one every 3min
     }
 
     i += 1;

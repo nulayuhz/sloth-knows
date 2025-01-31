@@ -7,7 +7,7 @@ const openai = new OpenAI();
 
 // const questions = `given the orange line for SMA 20, beige line for SMA 50, pink line for SMA 200, and other trend lines; 1. what graph pattern and trend does the chart show? 2. tell me what are the resistance levels and support levels 3. predict the price action movement for the next month, 4. what is a good entry price if I were to look for short to medium term gain?`;
 // const questions = `given the orange line for SMA 20, beige line for SMA 50, pink line for SMA 200, and other trend lines, can you identify the trend, support, resistance, good entry price and predict short to medium term price action movement`;
-const questions = `given SMA lines and other sloping lines, analyze the entry price; is it near breakout, or consolidation; if yes, what is the breakout entry price`;
+const questions = `given SMA lines and other sloping lines, analyze the entry price; is it near breakout, or consolidation; if yes, what is breakpoint price or consolidation range. is current price near it`;
 const failToInterpretWords = [
   "unable to analyze",
   "unable to view",
@@ -19,7 +19,7 @@ const failToInterpretWords = [
 
 const askChat = async (url: string) => {
   return await openai.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4o-2024-08-06",
     messages: [
       {
         role: "developer",
@@ -33,13 +33,25 @@ const askChat = async (url: string) => {
       {
         role: "user",
         content: [
-          { type: "text", text: "what is a good entry price" },
-          // {
-          //   type: "image_url",
-          //   image_url: {
-          //     url,
-          //   },
-          // },
+          {
+            type: "text",
+            text: "analyze the entry price; is it near breakout, or consolidation",
+          },
+          {
+            type: "image_url",
+            image_url: {
+              url,
+            },
+          },
+        ],
+      },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: "is current price near breakpoint",
+          },
         ],
       },
     ],
@@ -66,6 +78,22 @@ export const analyzeImage = async (url: string) => {
 export const analyzeMultipleImages = async (urls: string[]) => {
   const content: Array<ChatCompletionContentPart> = [
     { type: "text", text: questions },
+    {
+      type: "text",
+      text: "what are support and resistance level",
+    },
+    {
+      type: "text",
+      text: "analyze the entry price; is it near breakout, or consolidation",
+    },
+    {
+      type: "text",
+      text: "is current price near breakpoint",
+    },
+    {
+      type: "text",
+      text: "what are signals for entrance? is it higher than normal volume? what else",
+    },
   ];
   urls.forEach((url) => {
     content.push({
@@ -77,7 +105,7 @@ export const analyzeMultipleImages = async (urls: string[]) => {
   });
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "gpt-4o-2024-08-06",
     messages: [
       {
         role: "developer",
